@@ -28,5 +28,6 @@ output application/json
 		</ee:transform>
 		<http:request method="POST" doc:name="Request" doc:id="63584908-4c19-463f-ab90-4429a734d1ed" config-ref="HTTP_Request_configuration" path="/.netlify/functions/index" />
 		<logger level="INFO" doc:name="Response" doc:id="e6c053ba-a319-4ce8-b189-8f454c3c7ea9" message="#[payload]" />
+		<logger level="INFO" doc:name="Logger" doc:id="d9b0636f-0c73-4ca3-a85d-12bd7c05dc5d" message="done"/>
 	</flow>
 </mule>
