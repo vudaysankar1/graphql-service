@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="74b1eb1e-e8ee-4da7-a146-2905d328186f" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="8fc1ff19-4d43-48b3-8ffa-fcaca7e53f14">
+		<http:request-connection protocol="HTTPS" host="swapi-graphql.netlify.app" port="443" />
+	</http:request-config>
+	<flow name="graphql-serviceFlow" doc:id="d637a642-5fc6-4217-91a8-2108ffe1139c" >
+		<http:listener doc:name="Listener" doc:id="56927f49-80ce-4bd9-88d3-2c2e7390019c" path="/graphql" config-ref="HTTP_Listener_config"/>
+		<ee:transform doc:name="Transform Message" doc:id="f3807d9f-0146-4e12-abdc-bdea5bf6a0a9">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"query": "query Query(\$first: Int) {\r\n  allFilms (last: \$first) {\r\n    films{\r\n      title\r\n      director\r\n      releaseDate\r\n      speciesConnection {\r\n        species {\r\n          name\r\n          classification\r\n          homeworld {\r\n            name\r\n          }\r\n        }\r\n      }\r\n    }\r\n  }\r\n}\r\n",
+	"variables": {
+		"first": 1
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<http:request method="POST" doc:name="Request" doc:id="63584908-4c19-463f-ab90-4429a734d1ed" config-ref="HTTP_Request_configuration" path="/.netlify/functions/index" />
+		<logger level="INFO" doc:name="Response" doc:id="e6c053ba-a319-4ce8-b189-8f454c3c7ea9" message="#[payload]" />
+	</flow>
+</mule>
